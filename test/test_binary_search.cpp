@@ -15,6 +15,7 @@
 
 #include <boost/compute/command_queue.hpp>
 #include <boost/compute/algorithm/binary_search.hpp>
+#include <boost/compute/algorithm/iota.hpp>
 #include <boost/compute/algorithm/lower_bound.hpp>
 #include <boost/compute/algorithm/upper_bound.hpp>
 #include <boost/compute/container/vector.hpp>
@@ -62,6 +63,17 @@ BOOST_AUTO_TEST_CASE(range_bounds_int)
 
     BOOST_CHECK(boost::compute::lower_bound(vector.begin(), vector.end(), int(6)) == vector.end());
     BOOST_CHECK(boost::compute::upper_bound(vector.begin(), vector.end(), int(6)) == vector.end());
+}
+
+BOOST_AUTO_TEST_CASE(binary_search_large)
+{
+    boost::compute::vector<int> vec(1000, context);
+    boost::compute::iota(vec.begin(), vec.end(), 1, queue);
+
+    BOOST_CHECK(boost::compute::binary_search(vec.begin(), vec.end(), int(0)) == false);
+    BOOST_CHECK(boost::compute::binary_search(vec.begin(), vec.end(), int(1)) == true);
+    BOOST_CHECK(boost::compute::binary_search(vec.begin(), vec.end(), int(1000)) == true);
+    BOOST_CHECK(boost::compute::binary_search(vec.begin(), vec.end(), int(1001)) == false);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
