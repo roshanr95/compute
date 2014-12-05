@@ -23,10 +23,11 @@ namespace compute {
 
 /// Merges the sorted values in the range [\p first, \p middle) with
 /// the sorted values in the range [\p middle, \p last) in-place.
-template<class Iterator>
+template<class Iterator, class Compare>
 inline void inplace_merge(Iterator first,
                           Iterator middle,
                           Iterator last,
+                          Compare comp,
                           command_queue &queue = system::default_queue())
 {
     BOOST_ASSERT(first < middle && middle < last);
@@ -50,8 +51,21 @@ inline void inplace_merge(Iterator first,
         right.begin(),
         right.end(),
         first,
+        comp,
         queue
     );
+}
+
+/// \overload
+template<class Iterator>
+inline void inplace_merge(Iterator first,
+                          Iterator middle,
+                          Iterator last,
+                          command_queue &queue = system::default_queue())
+{
+    typedef typename std::iterator_traits<Iterator>::value_type value_type;
+    ::boost::compute::less<value_type> less_than;
+    return inplace_merge(first, middle, last, less_than, queue);
 }
 
 } // end compute namespace
