@@ -14,6 +14,9 @@ endif()
 find_package(Boost 1.48 REQUIRED COMPONENTS ${BOOST_COMPONENTS})
 add_definitions(-DBOOST_TEST_DYN_LINK)
 
+# enable automatic kernel compilation error messages for tests
+add_definitions(-DBOOST_COMPUTE_DEBUG_KERNEL_COMPILATION)
+
 # enable code coverage generation (only with GCC for now)
 if(${BOOST_COMPUTE_ENABLE_COVERAGE} AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   add_definitions(-fprofile-arcs -ftest-coverage)
@@ -52,7 +55,10 @@ add_compute_test("core.program" test_program.cpp)
 add_compute_test("core.system" test_system.cpp)
 add_compute_test("core.type_traits" test_type_traits.cpp)
 add_compute_test("core.user_event" test_user_event.cpp)
-add_compute_test("core.wait_list" test_wait_list.cpp)
+
+add_compute_test("utility.extents" test_extents.cpp)
+add_compute_test("utility.program_cache" test_program_cache.cpp)
+add_compute_test("utility.wait_list" test_wait_list.cpp)
 
 add_compute_test("algorithm.accumulate" test_accumulate.cpp)
 add_compute_test("algorithm.adjacent_difference" test_adjacent_difference.cpp)
@@ -112,6 +118,7 @@ add_compute_test("algorithm.transform" test_transform.cpp)
 add_compute_test("algorithm.transform_reduce" test_transform_reduce.cpp)
 add_compute_test("algorithm.unique" test_unique.cpp)
 add_compute_test("algorithm.unique_copy" test_unique_copy.cpp)
+add_compute_test("algorithm.lexicographical_compare" test_lexicographical_compare.cpp)
 
 add_compute_test("allocator.buffer_allocator" test_buffer_allocator.cpp)
 add_compute_test("allocator.pinned_allocator" test_pinned_allocator.cpp)
@@ -129,12 +136,15 @@ add_compute_test("container.valarray" test_valarray.cpp)
 add_compute_test("container.vector" test_vector.cpp)
 
 add_compute_test("exception.opencl_error" test_opencl_error.cpp)
+add_compute_test("exception.context_error" test_context_error.cpp)
+add_compute_test("exception.unsupported_extension" test_unsupported_extension.cpp)
 
 add_compute_test("functional.as" test_functional_as.cpp)
 add_compute_test("functional.bind" test_functional_bind.cpp)
 add_compute_test("functional.convert" test_functional_convert.cpp)
 add_compute_test("functional.get" test_functional_get.cpp)
 add_compute_test("functional.hash" test_functional_hash.cpp)
+add_compute_test("functional.identity" test_functional_identity.cpp)
 add_compute_test("functional.popcount" test_functional_popcount.cpp)
 add_compute_test("functional.unpack" test_functional_unpack.cpp)
 
@@ -142,6 +152,7 @@ add_compute_test("iterator.buffer_iterator" test_buffer_iterator.cpp)
 add_compute_test("iterator.constant_iterator" test_constant_iterator.cpp)
 add_compute_test("iterator.counting_iterator" test_counting_iterator.cpp)
 add_compute_test("iterator.discard_iterator" test_discard_iterator.cpp)
+add_compute_test("iterator.function_input_iterator" test_function_input_iterator.cpp)
 add_compute_test("iterator.permutation_iterator" test_permutation_iterator.cpp)
 add_compute_test("iterator.transform_iterator" test_transform_iterator.cpp)
 add_compute_test("iterator.zip_iterator" test_zip_iterator.cpp)
@@ -156,11 +167,13 @@ add_compute_test("random.normal_distribution" test_normal_distribution.cpp)
 add_compute_test("random.uniform_int_distribution" test_uniform_int_distribution.cpp)
 add_compute_test("random.uniform_real_distribution" test_uniform_real_distribution.cpp)
 
-add_compute_test("types.builtin" test_types.cpp)
+add_compute_test("types.fundamental" test_types.cpp)
 add_compute_test("types.complex" test_complex.cpp)
 add_compute_test("types.pair" test_pair.cpp)
 add_compute_test("types.tuple" test_tuple.cpp)
 add_compute_test("types.struct" test_struct.cpp)
+
+add_compute_test("type_traits.result_of" test_result_of.cpp)
 
 add_compute_test("experimental.clamp_range" test_clamp_range.cpp)
 add_compute_test("experimental.malloc" test_malloc.cpp)
@@ -169,7 +182,6 @@ add_compute_test("experimental.tabulate" test_tabulate.cpp)
 add_compute_test("experimental.transform_if" test_transform_if.cpp)
 
 add_compute_test("ext.lambda" test_lambda.cpp)
-add_compute_test("ext.program_cache" test_program_cache.cpp)
 add_compute_test("ext.amd_cpp_kernel_language" test_amd_cpp_kernel_language.cpp)
 
 # eigen interop tests

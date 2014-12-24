@@ -19,12 +19,14 @@
 
 #include <boost/compute/config.hpp>
 #include <boost/compute/exception.hpp>
-#include <boost/compute/types/builtin.hpp>
+#include <boost/compute/types/fundamental.hpp>
 #include <boost/compute/detail/get_object_info.hpp>
 #include <boost/compute/detail/assert_cl_success.hpp>
 
 namespace boost {
 namespace compute {
+
+class platform;
 
 /// \class device
 /// \brief A compute device.
@@ -154,6 +156,13 @@ public:
     {
         return get_info<cl_device_type>(CL_DEVICE_TYPE);
     }
+
+    #ifdef BOOST_COMPUTE_DOXYGEN_INVOKED
+    /// Returns the platform for the device.
+    platform platform() const;
+    #else
+    boost::compute::platform platform() const;
+    #endif
 
     /// Returns the name of the device.
     std::string name() const

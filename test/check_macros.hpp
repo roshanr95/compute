@@ -20,7 +20,7 @@
     { \
         type _actual[size]; \
         boost::compute::copy( \
-            actual.begin(), actual.end(), _actual, queue \
+            actual.begin(), actual.begin()+size, _actual, queue \
         ); \
         const type _expected[size] = { \
             BOOST_PP_REPEAT(size, LIST_ARRAY_VALUES, (size, expected)) \
@@ -38,6 +38,15 @@
         BOOST_CHECK_EQUAL_COLLECTIONS( \
             actual, actual + size, _expected, _expected + size \
         ); \
+    }
+
+#define CHECK_STRING_EQUAL(actual, expected) \
+    { \
+        std::string _actual(actual.size(), '\0'); \
+        boost::compute::copy( \
+            actual.begin(), actual.end(), _actual.begin(), queue \
+        ); \
+        BOOST_CHECK_EQUAL(_actual, expected); \
     }
 
 #endif // BOOST_COMPUTE_TEST_CHECK_MACROS_HPP

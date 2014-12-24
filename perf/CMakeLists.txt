@@ -23,6 +23,7 @@ set(BENCHMARKS
   count
   discrete_distribution
   erase_remove
+  exclusive_scan
   fill
   find_end
   includes
@@ -30,6 +31,7 @@ set(BENCHMARKS
   is_permutation
   is_sorted
   linear_congruential_engine
+  max_element
   merge
   mersenne_twister
   next_permutation
@@ -56,7 +58,6 @@ set(BENCHMARKS
   uniform_int_distribution
   unique
   unique_copy
-  exclusive_scan
 )
 
 foreach(BENCHMARK ${BENCHMARKS})
@@ -72,6 +73,7 @@ set(STL_BENCHMARKS
   stl_find_end
   stl_includes
   stl_inner_product
+  stl_max_element
   stl_merge
   stl_next_permutation
   stl_partial_sum
@@ -115,11 +117,17 @@ if(${BOOST_COMPUTE_HAVE_CUDA})
   set(CUDA_BENCHMARKS
     thrust_accumulate
     thrust_count
-    thrust_inner_product
-    thrust_partial_sum
-    thrust_saxpy
-    thrust_sort
     thrust_exclusive_scan
+    thrust_inner_product
+    thrust_merge
+    thrust_partial_sum
+    thrust_partition
+    thrust_reverse
+    thrust_rotate
+    thrust_saxpy
+    thrust_set_difference
+    thrust_sort
+    thrust_unique
   )
 
   foreach(BENCHMARK ${CUDA_BENCHMARKS})

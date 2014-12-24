@@ -15,7 +15,6 @@
 #include <iterator>
 
 #include <boost/config.hpp>
-#include <boost/utility/result_of.hpp>
 #include <boost/iterator/iterator_adaptor.hpp>
 
 #include <boost/compute/functional.hpp>
@@ -24,6 +23,7 @@
 #include <boost/compute/detail/is_device_iterator.hpp>
 #include <boost/compute/detail/read_write_single_value.hpp>
 #include <boost/compute/iterator/detail/get_base_iterator_buffer.hpp>
+#include <boost/compute/type_traits/result_of.hpp>
 
 namespace boost {
 namespace compute {
@@ -40,7 +40,7 @@ struct make_transform_iterator_value_type
 {
     typedef typename std::iterator_traits<InputIterator>::value_type value_type;
 
-    typedef typename boost::tr1_result_of<UnaryFunction(value_type)>::type type;
+    typedef typename boost::compute::result_of<UnaryFunction(value_type)>::type type;
 };
 
 // helper class which defines the iterator_adaptor super-class
@@ -95,7 +95,7 @@ inline meta_kernel& operator<<(meta_kernel &kernel,
 /// \class transform_iterator
 /// \brief A transform iterator adaptor.
 ///
-/// The transform_iterator adaptor applys a unary function to each element
+/// The transform_iterator adaptor applies a unary function to each element
 /// produced from the underlying iterator when dereferenced.
 ///
 /// For example, to copy from an input range to an output range while taking
@@ -197,7 +197,18 @@ private:
     UnaryFunction m_transform;
 };
 
-/// Returns a transform iterator for \p iterator with \p transform.
+/// Returns a transform_iterator for \p iterator with \p transform.
+///
+/// \param iterator the underlying iterator
+/// \param transform the unary transform function
+///
+/// \return a \c transform_iterator for \p iterator with \p transform
+///
+/// For example, to create an iterator which returns the square-root of each
+/// value in a \c vector<int>:
+/// \code
+/// auto sqrt_iterator = make_transform_iterator(vec.begin(), sqrt<int>());
+/// \endcode
 template<class InputIterator, class UnaryFunction>
 inline transform_iterator<InputIterator, UnaryFunction>
 make_transform_iterator(InputIterator iterator, UnaryFunction transform)

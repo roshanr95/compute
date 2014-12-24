@@ -10,12 +10,13 @@
 
 #include <iostream>
 
-#include <boost/compute/source.hpp>
 #include <boost/compute/system.hpp>
 #include <boost/compute/algorithm/copy.hpp>
 #include <boost/compute/algorithm/accumulate.hpp>
 #include <boost/compute/algorithm/exclusive_scan.hpp>
 #include <boost/compute/container/vector.hpp>
+#include <boost/compute/utility/dim.hpp>
+#include <boost/compute/utility/source.hpp>
 
 namespace compute = boost::compute;
 
@@ -108,6 +109,7 @@ const char fizz_buzz_source[] = BOOST_COMPUTE_STRINGIZE_SOURCE(
 
 int main()
 {
+    using compute::dim;
     using compute::uint_;
 
     // fizz-buzz up to 100
@@ -130,13 +132,7 @@ int main()
     // run the allocate kernel to calculate string lengths
     compute::kernel allocate_kernel(fizz_buzz_program, "fizz_buzz_allocate_strings");
     allocate_kernel.set_arg(0, offsets);
-
-    size_t offset = 0;
-    size_t global_work_size = n;
-    size_t local_work_size = 1;
-    queue.enqueue_nd_range_kernel(
-        allocate_kernel, 1, &offset, &global_work_size, &local_work_size
-    );
+    queue.enqueue_nd_range_kernel(allocate_kernel, dim(0), dim(n), dim(1));
 
     // allocate space for the output string
     output.resize(
@@ -152,9 +148,7 @@ int main()
     compute::kernel copy_kernel(fizz_buzz_program, "fizz_buzz_copy_strings");
     copy_kernel.set_arg(0, offsets);
     copy_kernel.set_arg(1, output);
-    queue.enqueue_nd_range_kernel(
-        copy_kernel, 1, &offset, &global_work_size, &local_work_size
-    );
+    queue.enqueue_nd_range_kernel(copy_kernel, dim(0), dim(n), dim(1));
 
     // copy the string to the host and print it to stdout
     std::string str;

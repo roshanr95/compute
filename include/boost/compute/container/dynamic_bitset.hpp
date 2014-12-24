@@ -17,14 +17,24 @@
 #include <boost/compute/algorithm/transform_reduce.hpp>
 #include <boost/compute/container/vector.hpp>
 #include <boost/compute/functional/integer.hpp>
-#include <boost/compute/types/builtin.hpp>
+#include <boost/compute/types/fundamental.hpp>
 
 namespace boost {
 namespace compute {
 
-/// The dynamic_bitset class contains a resizable bit array.
+/// \class dynamic_bitset
+/// \brief The dynamic_bitset class contains a resizable bit array.
 ///
-/// \see vector<T>
+/// For example, to create a dynamic-bitset with space for 1000 bits on the
+/// device:
+/// \code
+/// boost::compute::dynamic_bitset<> bits(1000, queue);
+/// \endcode
+///
+/// The Boost.Compute \c dynamic_bitset class provides a STL-like API and is
+/// modeled after the \c boost::dynamic_bitset class from Boost.
+///
+/// \see \ref vector "vector<T>"
 template<class Block = ulong_, class Alloc = buffer_allocator<Block> >
 class dynamic_bitset
 {
@@ -97,16 +107,16 @@ public:
     /// Returns the number of set bits (i.e. '1') in the bitset.
     size_type count(command_queue &queue) const
     {
-        size_type count = 0;
+        ulong_ count = 0;
         transform_reduce(
             m_bits.begin(),
             m_bits.end(),
             &count,
             popcount<block_type>(),
-            plus<size_type>(),
+            plus<ulong_>(),
             queue
         );
-        return count;
+        return static_cast<size_type>(count);
     }
 
     /// Resizes the bitset to contain \p num_bits. If the new size is greater

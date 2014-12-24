@@ -24,9 +24,10 @@
 #include <boost/compute/image2d.hpp>
 #include <boost/compute/image3d.hpp>
 #include <boost/compute/exception.hpp>
-#include <boost/compute/wait_list.hpp>
+#include <boost/compute/utility/wait_list.hpp>
 #include <boost/compute/detail/get_object_info.hpp>
 #include <boost/compute/detail/assert_cl_success.hpp>
+#include <boost/compute/utility/extents.hpp>
 
 namespace boost {
 namespace compute {
@@ -1249,6 +1250,24 @@ public:
         return event_;
     }
 
+    /// \overload
+    template<size_t N>
+    event enqueue_nd_range_kernel(const kernel &kernel,
+                                  const extents<N> &global_work_offset,
+                                  const extents<N> &global_work_size,
+                                  const extents<N> &local_work_size,
+                                  const wait_list &events = wait_list())
+    {
+        return enqueue_nd_range_kernel(
+            kernel,
+            N,
+            global_work_offset.data(),
+            global_work_size.data(),
+            local_work_size.data(),
+            events
+        );
+    }
+
     /// Convenience method which calls enqueue_nd_range_kernel() with a
     /// one-dimensional range.
     event enqueue_1d_range_kernel(const kernel &kernel,
@@ -1277,13 +1296,20 @@ public:
 
         event event_;
 
-        cl_int ret = clEnqueueTask(
-            m_queue,
-            kernel,
-            events.size(),
-            events.get_event_ptr(),
-            &event_.get()
+        // clEnqueueTask() was deprecated in OpenCL 2.0. In that case we
+        // just forward to the equivalent clEnqueueNDRangeKernel() call.
+        #ifdef CL_VERSION_2_0
+        size_t one = 1;
+        cl_int ret = clEnqueueNDRangeKernel(
+            m_queue, kernel, 1, 0, &one, &one,
+            events.size(), events.get_event_ptr(), &event_.get()
         );
+        #else
+        cl_int ret = clEnqueueTask(
+            m_queue, kernel, events.size(), events.get_event_ptr(), &event_.get()
+        );
+        #endif
+
         if(ret != CL_SUCCESS){
             BOOST_THROW_EXCEPTION(opencl_error(ret));
         }

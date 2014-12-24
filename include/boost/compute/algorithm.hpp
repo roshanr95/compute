@@ -36,6 +36,7 @@
 #include <boost/compute/algorithm/find_if.hpp>
 #include <boost/compute/algorithm/find_if_not.hpp>
 #include <boost/compute/algorithm/for_each.hpp>
+#include <boost/compute/algorithm/for_each_n.hpp>
 #include <boost/compute/algorithm/gather.hpp>
 #include <boost/compute/algorithm/generate.hpp>
 #include <boost/compute/algorithm/generate_n.hpp>
@@ -47,6 +48,7 @@
 #include <boost/compute/algorithm/is_permutation.hpp>
 #include <boost/compute/algorithm/is_sorted.hpp>
 #include <boost/compute/algorithm/lower_bound.hpp>
+#include <boost/compute/algorithm/lexicographical_compare.hpp> 
 #include <boost/compute/algorithm/max_element.hpp>
 #include <boost/compute/algorithm/merge.hpp>
 #include <boost/compute/algorithm/min_element.hpp>

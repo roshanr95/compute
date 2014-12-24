@@ -8,10 +8,13 @@
 #include <QtGui>
 #endif
 
-#include <boost/compute/source.hpp>
+#ifndef Q_MOC_RUN
 #include <boost/compute/system.hpp>
 #include <boost/compute/image2d.hpp>
 #include <boost/compute/interop/qt.hpp>
+#include <boost/compute/utility/dim.hpp>
+#include <boost/compute/utility/source.hpp>
+#endif // Q_MOC_RUN
 
 namespace compute = boost::compute;
 
@@ -21,6 +24,8 @@ inline void box_filter_image(const compute::image2d &input,
                              compute::uint_ box_width,
                              compute::command_queue &queue)
 {
+    using compute::dim;
+
     const compute::context &context = queue.get_context();
 
     // simple box filter kernel source
@@ -69,11 +74,7 @@ inline void box_filter_image(const compute::image2d &input,
     kernel.set_arg(3, box_width);
 
     // execute the box filter kernel
-    size_t origin[2] = { 0, 0 };
-    size_t region[2] = { input.width(), input.height() };
-    size_t work_size[2] = { 1, 1 };
-
-    queue.enqueue_nd_range_kernel(kernel, 2, origin, region, work_size);
+    queue.enqueue_nd_range_kernel(kernel, dim(0, 0), input.size(), dim(1, 1));
 }
 
 // this example shows how to load an image using Qt, apply a simple

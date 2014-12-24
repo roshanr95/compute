@@ -36,8 +36,8 @@
 #include <boost/compute/image_sampler.hpp>
 #include <boost/compute/memory_object.hpp>
 #include <boost/compute/detail/device_ptr.hpp>
-#include <boost/compute/detail/program_cache.hpp>
 #include <boost/compute/detail/sha1.hpp>
+#include <boost/compute/utility/program_cache.hpp>
 
 namespace boost {
 namespace compute {
@@ -336,20 +336,15 @@ public:
         std::string source = this->source();
 
         // generate cache key
-        std::string cache_key = detail::sha1(source);
+        std::string cache_key = "__boost_meta_kernel_" + detail::sha1(source);
 
-        // try to look the program up in the cache
-        boost::shared_ptr<program_cache> cache = get_program_cache(context);
-        ::boost::compute::program program = cache->get(cache_key);
+        // load program cache
+        boost::shared_ptr<program_cache> cache =
+            program_cache::get_global_cache(context);
 
-        // build the program if it was not in the cache
-        if(!program.get()){
-            program = ::boost::compute::program::build_with_source(
-                source, context, options
-            );
-
-            cache->insert(cache_key, program);
-        }
+        // load (or build) program from cache
+        ::boost::compute::program program =
+            cache->get_or_build(cache_key, options, source, context);
 
         // create kernel
         ::boost::compute::kernel kernel = program.create_kernel(name());
@@ -580,6 +575,11 @@ public:
         default:
             return *this << "'" << c << "'";
         }
+    }
+
+    meta_kernel& operator<<(const meta_kernel_literal<signed char> &literal)
+    {
+        return *this << lit<char>(literal.value());
     }
 
     meta_kernel& operator<<(const meta_kernel_literal<unsigned char> &literal)
@@ -1020,6 +1020,13 @@ inline meta_kernel& operator<<(meta_kernel &k,
                                const invoked_convert<T, Arg> &expr)
 {
     return k << "convert_" << type_name<T>() << "(" << expr.m_arg << ")";
+}
+
+template<class T, class Arg>
+inline meta_kernel& operator<<(meta_kernel &k,
+                               const invoked_identity<T, Arg> &expr)
+{
+    return k << expr.m_arg;
 }
 
 template<>

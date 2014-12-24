@@ -27,15 +27,16 @@ doxygen autodoc
     ../include/boost/compute/pipe.hpp
     ../include/boost/compute/platform.hpp
     ../include/boost/compute/program.hpp
-    ../include/boost/compute/source.hpp
     ../include/boost/compute/svm.hpp
     ../include/boost/compute/system.hpp
     ../include/boost/compute/user_event.hpp
     ../include/boost/compute/version.hpp
-    ../include/boost/compute/wait_list.hpp
 
     ../include/boost/compute/algorithm.hpp
     [ glob ../include/boost/compute/algorithm/*.hpp ]
+
+    ../include/boost/compute/allocator.hpp
+    [ glob ../include/boost/compute/allocator/*.hpp ]
 
     ../include/boost/compute/async.hpp
     [ glob ../include/boost/compute/async/*.hpp ]
@@ -47,9 +48,7 @@ doxygen autodoc
     [ glob ../include/boost/compute/exception/*.hpp ]
 
     ../include/boost/compute/functional.hpp
-    ../include/boost/compute/functional/field.hpp
-    ../include/boost/compute/functional/get.hpp
-    ../include/boost/compute/functional/popcount.hpp
+    [ glob ../include/boost/compute/functional/*.hpp ]
 
     ../include/boost/compute/interop/opengl.hpp
     [ glob ../include/boost/compute/interop/opengl/*.hpp ]
@@ -68,6 +67,9 @@ doxygen autodoc
 
     ../include/boost/compute/type_traits.hpp
     [ glob ../include/boost/compute/type_traits/*.hpp ]
+
+    ../include/boost/compute/utility.hpp
+    [ glob ../include/boost/compute/utility/*.hpp ]
   :
     <doxygen:param>QUIET=YES
     <doxygen:param>WARNINGS=YES

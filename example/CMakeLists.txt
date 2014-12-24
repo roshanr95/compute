@@ -41,6 +41,11 @@ include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 foreach(EXAMPLE ${EXAMPLES})
   add_executable(${EXAMPLE} ${EXAMPLE}.cpp)
   target_link_libraries(${EXAMPLE} ${OPENCL_LIBRARIES} ${Boost_LIBRARIES})
+
+  # add example program to list of tests (if testing is enabled)
+  if(${BOOST_COMPUTE_BUILD_TESTS})
+    add_test("example.${EXAMPLE}" ${EXAMPLE})
+  endif()
 endforeach()
 
 # opencl test example
@@ -67,6 +72,7 @@ if(${BOOST_COMPUTE_HAVE_OPENCV})
     opencv_optical_flow 
     opencv_convolution
     opencv_sobel_filter
+    opencv_histogram
   )
 
   foreach(EXAMPLE ${OPENCV_EXAMPLES})

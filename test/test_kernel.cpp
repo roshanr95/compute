@@ -13,8 +13,8 @@
 
 #include <boost/compute/buffer.hpp>
 #include <boost/compute/kernel.hpp>
-#include <boost/compute/source.hpp>
 #include <boost/compute/system.hpp>
+#include <boost/compute/utility/source.hpp>
 
 #include "context_setup.hpp"
 
@@ -115,6 +115,8 @@ BOOST_AUTO_TEST_CASE(kernel_set_args)
 #ifdef CL_VERSION_1_2
 BOOST_AUTO_TEST_CASE(get_arg_info)
 {
+    REQUIRES_OPENCL_VERSION(1, 2);
+
     const char source[] = BOOST_COMPUTE_STRINGIZE_SOURCE(
         __kernel void sum_kernel(__global const int *input,
                                  const uint size,

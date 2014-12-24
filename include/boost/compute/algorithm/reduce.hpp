@@ -13,8 +13,6 @@
 
 #include <iterator>
 
-#include <boost/utility/result_of.hpp>
-
 #include <boost/compute/system.hpp>
 #include <boost/compute/functional.hpp>
 #include <boost/compute/detail/meta_kernel.hpp>
@@ -26,6 +24,7 @@
 #include <boost/compute/algorithm/detail/reduce_on_gpu.hpp>
 #include <boost/compute/algorithm/detail/serial_reduce.hpp>
 #include <boost/compute/detail/iterator_range_size.hpp>
+#include <boost/compute/type_traits/result_of.hpp>
 
 namespace boost {
 namespace compute {
@@ -43,7 +42,7 @@ size_t reduce(InputIterator first,
         std::iterator_traits<InputIterator>::value_type
         input_type;
     typedef typename
-        boost::tr1_result_of<BinaryFunction(input_type, input_type)>::type
+        boost::compute::result_of<BinaryFunction(input_type, input_type)>::type
         result_type;
 
     const context &context = queue.get_context();
@@ -123,7 +122,7 @@ size_t reduce(InputIterator first,
 
 template<class InputIterator, class BinaryFunction>
 inline vector<
-    typename boost::tr1_result_of<
+    typename boost::compute::result_of<
         BinaryFunction(
             typename std::iterator_traits<InputIterator>::value_type,
             typename std::iterator_traits<InputIterator>::value_type
@@ -140,7 +139,7 @@ block_reduce(InputIterator first,
         std::iterator_traits<InputIterator>::value_type
         input_type;
     typedef typename
-        boost::tr1_result_of<BinaryFunction(input_type, input_type)>::type
+        boost::compute::result_of<BinaryFunction(input_type, input_type)>::type
         result_type;
 
     const context &context = queue.get_context();
@@ -164,7 +163,7 @@ inline void generic_reduce(InputIterator first,
         std::iterator_traits<InputIterator>::value_type
         input_type;
     typedef typename
-        boost::tr1_result_of<BinaryFunction(input_type, input_type)>::type
+        boost::compute::result_of<BinaryFunction(input_type, input_type)>::type
         result_type;
 
     const device &device = queue.get_device();
@@ -242,9 +241,17 @@ inline void dispatch_reduce(InputIterator first,
 ///
 /// If no function is specified, \c plus will be used.
 ///
-/// The difference between the reduce() function and the accumulate()
-/// function is that reduce() requires the binary operator to be
-/// commutative.
+/// \param first first element in the input range
+/// \param last last element in the input range
+/// \param result iterator pointing to the output
+/// \param function binary reduction function
+/// \param queue command queue to perform the operation
+///
+/// The \c reduce() algorithm assumes that the binary reduction function is
+/// associative. When used with non-associative functions the result may
+/// be non-deterministic and vary in precision. Notably this affects the
+/// \c plus<float>() function as floating-point addition is not associative
+/// and may produce slightly different results than a serial algorithm.
 ///
 /// This algorithm supports both host and device iterators for the
 /// result argument. This allows for values to be reduced and copied
@@ -254,6 +261,11 @@ inline void dispatch_reduce(InputIterator first,
 /// copy the result to a value on the host:
 ///
 /// \snippet test/test_reduce.cpp sum_int
+///
+/// Note that while the the \c reduce() algorithm is conceptually identical to
+/// the \c accumulate() algorithm, its implementation is substantially more
+/// efficient on parallel hardware. For more information, see the documentation
+/// on the \c accumulate() algorithm.
 ///
 /// \see accumulate()
 template<class InputIterator, class OutputIterator, class BinaryFunction>

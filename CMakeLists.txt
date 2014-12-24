@@ -18,6 +18,12 @@ if(${BOOST_COMPUTE_USE_CPP11})
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 endif()
 
+# optional support for offline-caching
+option(BOOST_COMPUTE_USE_OFFLINE_CACHE "Use offline cache for OpenCL program binaries" OFF)
+if(${BOOST_COMPUTE_USE_OFFLINE_CACHE})
+  add_definitions(-DBOOST_COMPUTE_USE_OFFLINE_CACHE)
+endif()
+
 # thread-safety options
 option(BOOST_COMPUTE_THREAD_SAFE "Compile with BOOST_COMPUTE_THREAD_SAFE defined" OFF)
 if(${BOOST_COMPUTE_THREAD_SAFE})
@@ -49,11 +55,6 @@ endif()
 # compiler options
 option(BOOST_COMPUTE_ENABLE_COVERAGE "Enable code coverage generation" OFF)
 
-option(BOOST_COMPUTE_BUILD_EXAMPLES "Build the Boost.Compute examples" OFF)
-if(${BOOST_COMPUTE_BUILD_EXAMPLES})
-  add_subdirectory(example)
-endif()
-
 option(BOOST_COMPUTE_BUILD_TESTS "Build the Boost.Compute tests" OFF)
 if(${BOOST_COMPUTE_BUILD_TESTS})
   enable_testing()
@@ -65,9 +66,9 @@ if(${BOOST_COMPUTE_BUILD_BENCHMARKS})
   add_subdirectory(perf)
 endif()
 
-option(BOOST_COMPUTE_USE_OFFLINE_CACHE "Use offline cache for OpenCL program binaries" OFF)
-if(${BOOST_COMPUTE_USE_OFFLINE_CACHE})
-    add_definitions(-DBOOST_COMPUTE_USE_OFFLINE_CACHE)
+option(BOOST_COMPUTE_BUILD_EXAMPLES "Build the Boost.Compute examples" OFF)
+if(${BOOST_COMPUTE_BUILD_EXAMPLES})
+  add_subdirectory(example)
 endif()
 
 # configure cmake config file
