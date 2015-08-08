@@ -64,13 +64,13 @@ public:
 
     vector_type(const vector_type<Scalar, N> &other)
     {
-        std::memcpy(m_value, other.m_value, sizeof(m_value));
+        std::memcpy(m_value, other.m_value, sizeof(scalar_type)*N);
     }
 
     vector_type<Scalar, N>&
     operator=(const vector_type<Scalar, N> &other)
     {
-        std::memcpy(m_value, other.m_value, sizeof(m_value));
+        std::memcpy(m_value, other.m_value, sizeof(scalar_type)*N);
         return *this;
     }
 
@@ -91,7 +91,7 @@ public:
 
     bool operator==(const vector_type<Scalar, N> &other) const
     {
-        return std::memcmp(m_value, other.m_value, sizeof(m_value)) == 0;
+        return std::memcmp(m_value, other.m_value, sizeof(scalar_type)*N) == 0;
     }
 
     bool operator!=(const vector_type<Scalar, N> &other) const
@@ -100,7 +100,7 @@ public:
     }
 
 protected:
-    scalar_type m_value[N];
+    scalar_type *m_value;
 };
 
 #define BOOST_COMPUTE_VECTOR_TYPE_CTOR_ARG_FUNCTION(z, i, _) \
@@ -112,21 +112,36 @@ protected:
 #define BOOST_COMPUTE_VECTOR_TYPE_ASSIGN_CTOR_SINGLE_ARG(z, i, _) \
     m_value[i] = arg;
 
+#define BOOST_COMPUTE_VECTOR_TYPE_S_ACCESSOR(z, i, cl_scalar) \
+    cl_scalar BOOST_PP_CAT(&s, i);
+#define BOOST_COMPUTE_VECTOR_TYPE_DECLARE_S_ACCESSORS(size, cl_scalar) \
+    BOOST_PP_REPEAT(size, BOOST_COMPUTE_VECTOR_TYPE_S_ACCESSOR, cl_scalar)
+
+#define BOOST_COMPUTE_VECTOR_TYPE_INIT_S_ACCESSOR(z, i, _) \
+    BOOST_PP_COMMA_IF(i) BOOST_PP_CAT(s, i)(m_fields[i])
+#define BOOST_COMPUTE_VECTOR_TYPE_INIT_S_ACCESSORS(size) \
+    BOOST_PP_REPEAT(size, BOOST_COMPUTE_VECTOR_TYPE_INIT_S_ACCESSOR, _)
+
 #define BOOST_COMPUTE_DECLARE_VECTOR_TYPE_CLASS(cl_scalar, size, class_name) \
     class class_name : public vector_type<cl_scalar, size> \
     { \
+    protected: \
+        cl_scalar m_fields[size]; \
     public: \
-        class_name() { } \
-        explicit class_name( scalar_type arg ) \
+        class_name() : BOOST_COMPUTE_VECTOR_TYPE_INIT_S_ACCESSORS(size) { m_value = m_fields; } \
+        explicit class_name( scalar_type arg ) : BOOST_COMPUTE_VECTOR_TYPE_INIT_S_ACCESSORS(size) \
         { \
+            m_value = m_fields; \
             BOOST_PP_REPEAT(size, BOOST_COMPUTE_VECTOR_TYPE_ASSIGN_CTOR_SINGLE_ARG, _) \
         } \
         class_name( \
             BOOST_PP_REPEAT(size, BOOST_COMPUTE_VECTOR_TYPE_CTOR_ARG_FUNCTION, _) \
-        ) \
+        ) : BOOST_COMPUTE_VECTOR_TYPE_INIT_S_ACCESSORS(size) \
         { \
-          BOOST_PP_REPEAT(size, BOOST_COMPUTE_VECTOR_TYPE_ASSIGN_CTOR_ARG, _) \
+            m_value = m_fields; \
+            BOOST_PP_REPEAT(size, BOOST_COMPUTE_VECTOR_TYPE_ASSIGN_CTOR_ARG, _) \
         } \
+        BOOST_COMPUTE_VECTOR_TYPE_DECLARE_S_ACCESSORS(size, cl_scalar) \
     };
 
 #define BOOST_COMPUTE_DECLARE_VECTOR_TYPE(scalar, size) \
